@@ -33,4 +33,42 @@ describe('evaluateHand', () => {
       expect(result.chosen5[2].rank).toBe('K');
     });
   });
+
+  describe('Two pair', () => {
+    it('detects two pair', () => {
+      const cards = parseCards(['As', 'Ad', 'Kh', 'Kc', '2s']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('TwoPair');
+    });
+
+    it('orders higher pair first, then lower pair, then kicker', () => {
+      const cards = parseCards(['As', 'Ad', '5h', '5c', 'Ks']);
+      const result = evaluateHand(cards);
+      const ranks = result.chosen5.map(c => c.rank);
+      expect(ranks[0]).toBe('A');
+      expect(ranks[1]).toBe('A');
+      expect(ranks[2]).toBe('5');
+      expect(ranks[3]).toBe('5');
+      expect(ranks[4]).toBe('K');
+    });
+  });
+
+  describe('Three of a kind', () => {
+    it('detects three of a kind', () => {
+      const cards = parseCards(['7s', '7d', '7h', 'Kc', '2s']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('ThreeOfAKind');
+    });
+
+    it('puts triplet first then kickers descending', () => {
+      const cards = parseCards(['7s', '7d', '7h', 'Ac', '2s']);
+      const result = evaluateHand(cards);
+      const ranks = result.chosen5.map(c => c.rank);
+      expect(ranks[0]).toBe('7');
+      expect(ranks[1]).toBe('7');
+      expect(ranks[2]).toBe('7');
+      expect(ranks[3]).toBe('A');
+      expect(ranks[4]).toBe('2');
+    });
+  });
 });
