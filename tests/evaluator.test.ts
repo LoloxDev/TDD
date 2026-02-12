@@ -71,4 +71,33 @@ describe('evaluateHand', () => {
       expect(ranks[4]).toBe('2');
     });
   });
+
+  describe('Straight', () => {
+    it('detects a basic straight', () => {
+      const cards = parseCards(['5s', '6d', '7h', '8c', '9s']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('Straight');
+    });
+
+    it('orders straight from high to low', () => {
+      const cards = parseCards(['5s', '6d', '7h', '8c', '9s']);
+      const result = evaluateHand(cards);
+      expect(result.chosen5.map(c => c.rank)).toEqual(['9', '8', '7', '6', '5']);
+    });
+
+    it('detects ace-high straight', () => {
+      const cards = parseCards(['Ts', 'Jd', 'Qh', 'Kc', 'As']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('Straight');
+      expect(result.chosen5[0].rank).toBe('A');
+    });
+
+    it('detects wheel (A-2-3-4-5)', () => {
+      const cards = parseCards(['As', '2d', '3h', '4c', '5s']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('Straight');
+      expect(result.chosen5[0].rank).toBe('5');
+      expect(result.chosen5[4].rank).toBe('A');
+    });
+  });
 });
