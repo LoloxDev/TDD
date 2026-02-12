@@ -28,4 +28,13 @@ describe('evaluateHand', () => {
     expect(result.category).toBe('TwoPair');
     expect(result.chosen5).toEqual(parseCards(['Ah', 'Ad', 'Kc', 'Kd', '2d']));
   });
+
+  it('detects ThreeOfAKind and keeps kickers in descending order', () => {
+    const cards = parseCards(['Qh', 'Qd', 'Qs', '2d', '9c']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('ThreeOfAKind');
+    expect(result.chosen5).toEqual(parseCards(['Qh', 'Qd', 'Qs', '9c', '2d']));
+  });
 });
