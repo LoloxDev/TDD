@@ -46,6 +46,30 @@ function ranksWithCount(counts: Record<Rank, number>, target: number): Rank[] {
   return ranks.sort((a, b) => rankValue(b) - rankValue(a));
 }
 
+function straightChosen5(sorted: Card[]): Card[] | null {
+  const uniqueRanks = [...new Set(sorted.map((card) => card.rank))] as Rank[];
+
+  if (uniqueRanks.length !== 5) {
+    return null;
+  }
+
+  const values = uniqueRanks.map(rankValue);
+  const isNormalStraight = values.every((value, index) => index === 0 || value === values[index - 1] - 1);
+
+  if (isNormalStraight) {
+    return uniqueRanks.map((rank) => sorted.find((card) => card.rank === rank) as Card);
+  }
+
+  const isWheel = uniqueRanks.join('') === 'A5432';
+
+  if (isWheel) {
+    const wheelOrder: Rank[] = ['5', '4', '3', '2', 'A'];
+    return wheelOrder.map((rank) => sorted.find((card) => card.rank === rank) as Card);
+  }
+
+  return null;
+}
+
 export function evaluateHand(cards: Card[]): PlayerHand {
   if (cards.length !== 5) {
     throw new Error(`evaluateHand expects 5 cards, got ${cards.length}`);
@@ -53,6 +77,14 @@ export function evaluateHand(cards: Card[]): PlayerHand {
 
   const sorted = sortByRankDesc(cards);
   const counts = countByRank(sorted);
+
+  const straightCards = straightChosen5(sorted);
+  if (straightCards) {
+    return {
+      category: 'Straight',
+      chosen5: straightCards,
+    };
+  }
 
   const tripRank = highestRankWithCount(counts, 3);
   if (tripRank) {
