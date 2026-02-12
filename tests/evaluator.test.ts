@@ -16,4 +16,21 @@ describe('evaluateHand', () => {
       expect(result.chosen5.map(c => c.rank)).toEqual(['A', 'K', '9', '7', '2']);
     });
   });
+
+  describe('One pair', () => {
+    it('should detect a pair of aces', () => {
+      const cards = parseCards(['As', 'Ad', 'Kh', '9c', '2s']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('OnePair');
+      expect(result.chosen5).toHaveLength(5);
+    });
+
+    it('should put the pair first then kickers descending', () => {
+      const cards = parseCards(['As', 'Ad', 'Kh', '9c', '2s']);
+      const result = evaluateHand(cards);
+      expect(result.chosen5[0].rank).toBe('A');
+      expect(result.chosen5[1].rank).toBe('A');
+      expect(result.chosen5[2].rank).toBe('K');
+    });
+  });
 });
