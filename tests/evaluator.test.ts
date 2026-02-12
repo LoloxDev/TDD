@@ -10,4 +10,13 @@ describe('evaluateHand', () => {
     expect(result.category).toBe('HighCard');
     expect(result.chosen5).toEqual(parseCards(['Ah', 'Ks', '8c', '4h', '2d']));
   });
+
+  it('detects OnePair and keeps pair first', () => {
+    const cards = parseCards(['Ah', 'Ad', '9c', '4h', '2d']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('OnePair');
+    expect(result.chosen5).toEqual(parseCards(['Ah', 'Ad', '9c', '4h', '2d']));
+  });
 });
