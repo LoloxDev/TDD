@@ -4,3 +4,6 @@
 export * from './types';
 export * from './card';
 export * from './rankUtils';
+export * from './evaluator';
+export * from './compare';
+export * from './bestOfSeven';
