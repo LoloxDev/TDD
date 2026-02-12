@@ -37,4 +37,22 @@ describe('evaluateHand', () => {
     expect(result.category).toBe('ThreeOfAKind');
     expect(result.chosen5).toEqual(parseCards(['Qh', 'Qd', 'Qs', '9c', '2d']));
   });
+
+  it('detects Straight with high card first in chosen5', () => {
+    const cards = parseCards(['6h', '5d', '9c', '8s', '7h']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('Straight');
+    expect(result.chosen5).toEqual(parseCards(['9c', '8s', '7h', '6h', '5d']));
+  });
+
+  it('detects wheel Straight (A-2-3-4-5)', () => {
+    const cards = parseCards(['Ah', '2d', '3c', '4s', '5h']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('Straight');
+    expect(result.chosen5).toEqual(parseCards(['5h', '4s', '3c', '2d', 'Ah']));
+  });
 });
