@@ -41,6 +41,11 @@ function highestRankWithCount(counts: Record<Rank, number>, target: number): Ran
   return matching[0];
 }
 
+function ranksWithCount(counts: Record<Rank, number>, target: number): Rank[] {
+  const ranks = (Object.keys(counts) as Rank[]).filter((rank) => counts[rank] === target);
+  return ranks.sort((a, b) => rankValue(b) - rankValue(a));
+}
+
 export function evaluateHand(cards: Card[]): PlayerHand {
   if (cards.length !== 5) {
     throw new Error(`evaluateHand expects 5 cards, got ${cards.length}`);
@@ -48,6 +53,19 @@ export function evaluateHand(cards: Card[]): PlayerHand {
 
   const sorted = sortByRankDesc(cards);
   const counts = countByRank(sorted);
+
+  const pairRanks = ranksWithCount(counts, 2);
+  if (pairRanks.length === 2) {
+    const highPair = sorted.filter((card) => card.rank === pairRanks[0]);
+    const lowPair = sorted.filter((card) => card.rank === pairRanks[1]);
+    const kicker = sorted.filter((card) => card.rank !== pairRanks[0] && card.rank !== pairRanks[1]);
+
+    return {
+      category: 'TwoPair',
+      chosen5: [...highPair, ...lowPair, ...kicker],
+    };
+  }
+
   const pairRank = highestRankWithCount(counts, 2);
 
   if (pairRank) {
