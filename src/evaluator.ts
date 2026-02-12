@@ -5,6 +5,10 @@ function sortByRankDesc(cards: Card[]): Card[] {
   return [...cards].sort((a, b) => rankValue(b.rank) - rankValue(a.rank));
 }
 
+function sortByRankAsc(cards: Card[]): Card[] {
+  return [...cards].sort((a, b) => rankValue(a.rank) - rankValue(b.rank));
+}
+
 function countByRank(cards: Card[]): Record<Rank, number> {
   const counts = {
     '2': 0,
@@ -46,6 +50,10 @@ function ranksWithCount(counts: Record<Rank, number>, target: number): Rank[] {
   return ranks.sort((a, b) => rankValue(b) - rankValue(a));
 }
 
+function isFlush(cards: Card[]): boolean {
+  return cards.every((card) => card.suit === cards[0].suit);
+}
+
 function straightChosen5(sorted: Card[]): Card[] | null {
   const uniqueRanks = [...new Set(sorted.map((card) => card.rank))] as Rank[];
 
@@ -77,6 +85,13 @@ export function evaluateHand(cards: Card[]): PlayerHand {
 
   const sorted = sortByRankDesc(cards);
   const counts = countByRank(sorted);
+
+  if (isFlush(sorted)) {
+    return {
+      category: 'Flush',
+      chosen5: sortByRankAsc(sorted),
+    };
+  }
 
   const straightCards = straightChosen5(sorted);
   if (straightCards) {
