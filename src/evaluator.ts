@@ -74,6 +74,20 @@ function findStraight(cards: Card[]): PlayerHand | null {
   return null;
 }
 
+function findFullHouse(cards: Card[]): PlayerHand | null {
+  const groups = groupByRank(cards);
+  let triplet: Card[] | null = null;
+  let pair: Card[] | null = null;
+  for (const [, group] of groups) {
+    if (group.length === 3) triplet = group;
+    if (group.length === 2) pair = group;
+  }
+  if (triplet && pair) {
+    return { category: 'FullHouse', chosen5: [...triplet, ...pair] };
+  }
+  return null;
+}
+
 function findFlush(cards: Card[]): PlayerHand | null {
   const suits = new Set(cards.map(c => c.suit));
   if (suits.size === 1) {
@@ -106,6 +120,9 @@ export function evaluateHand(cards: Card[]): PlayerHand {
     // straight flush - will implement later
     return { category: 'StraightFlush', chosen5: straight.chosen5 };
   }
+
+  const fullHouse = findFullHouse(cards);
+  if (fullHouse) return fullHouse;
 
   if (flush) return flush;
   if (straight) return straight;
