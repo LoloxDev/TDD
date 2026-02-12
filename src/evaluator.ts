@@ -60,6 +60,17 @@ function findStraight(cards: Card[]): PlayerHand | null {
     return { category: 'Straight', chosen5: sorted };
   }
 
+  // check wheel: A-2-3-4-5 (ace plays low)
+  const wheelValues = [14, 5, 4, 3, 2];
+  const hasWheel = wheelValues.every(v => values.includes(v));
+  if (hasWheel) {
+    // reorder as 5-4-3-2-A
+    const wheelCards = ['5', '4', '3', '2', 'A'].map(
+      r => cards.find(c => c.rank === r)!
+    );
+    return { category: 'Straight', chosen5: wheelCards };
+  }
+
   return null;
 }
 
