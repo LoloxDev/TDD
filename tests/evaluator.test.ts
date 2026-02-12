@@ -55,4 +55,13 @@ describe('evaluateHand', () => {
     expect(result.category).toBe('Straight');
     expect(result.chosen5).toEqual(parseCards(['5h', '4s', '3c', '2d', 'Ah']));
   });
+
+  it('detects Flush when all cards have same suit', () => {
+    const cards = parseCards(['Ah', 'Jh', '9h', '4h', '2h']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('Flush');
+    expect(result.chosen5).toHaveLength(5);
+  });
 });
