@@ -136,4 +136,42 @@ describe('evaluateHand', () => {
       expect(ranks.slice(3)).toEqual(['A', 'A']);
     });
   });
+
+  describe('Four of a kind', () => {
+    it('detects four of a kind', () => {
+      const cards = parseCards(['7s', '7d', '7h', '7c', 'As']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('FourOfAKind');
+    });
+
+    it('puts quad first then kicker', () => {
+      const cards = parseCards(['7s', '7d', '7h', '7c', 'As']);
+      const result = evaluateHand(cards);
+      const ranks = result.chosen5.map(c => c.rank);
+      expect(ranks.slice(0, 4)).toEqual(['7', '7', '7', '7']);
+      expect(ranks[4]).toBe('A');
+    });
+  });
+
+  describe('Straight flush', () => {
+    it('detects straight flush', () => {
+      const cards = parseCards(['5h', '6h', '7h', '8h', '9h']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('StraightFlush');
+    });
+
+    it('detects royal flush as straight flush', () => {
+      const cards = parseCards(['Ts', 'Js', 'Qs', 'Ks', 'As']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('StraightFlush');
+      expect(result.chosen5[0].rank).toBe('A');
+    });
+
+    it('detects wheel straight flush', () => {
+      const cards = parseCards(['Ad', '2d', '3d', '4d', '5d']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('StraightFlush');
+      expect(result.chosen5[0].rank).toBe('5');
+    });
+  });
 });
