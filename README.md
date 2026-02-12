@@ -34,6 +34,20 @@ Exemple : `As` = Ace of spades, `Th` = 10 of hearts
 8. One pair
 9. High card
 
+## Ordre des chosen5 (pour tests déterministes)
+
+- **Straight / Straight flush** : du plus haut au plus bas (wheel = 5,4,3,2,A)
+- **Four of a kind** : les 4 cartes du carré, puis kicker
+- **Full house** : les 3 du brelan, puis les 2 de la paire
+- **Flush / High card** : rangs décroissants
+- **Three of a kind** : triplet, puis 2 kickers décroissants
+- **Two pair** : paire haute, paire basse, kicker
+- **One pair** : paire, puis 3 kickers décroissants
+
+## Input
+
+On suppose qu'il n'y a pas de doublons dans les cartes en entrée (pas de validation).
+
 ## Lancer les tests
 
 ```bash
