@@ -120,4 +120,20 @@ describe('evaluateHand', () => {
       expect(result.category).not.toBe('Flush');
     });
   });
+
+  describe('Full house', () => {
+    it('detects full house (three + pair)', () => {
+      const cards = parseCards(['7s', '7d', '7h', 'Kc', 'Ks']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('FullHouse');
+    });
+
+    it('orders triplet first, then pair', () => {
+      const cards = parseCards(['7s', '7d', '7h', 'Ac', 'As']);
+      const result = evaluateHand(cards);
+      const ranks = result.chosen5.map(c => c.rank);
+      expect(ranks.slice(0, 3)).toEqual(['7', '7', '7']);
+      expect(ranks.slice(3)).toEqual(['A', 'A']);
+    });
+  });
 });
