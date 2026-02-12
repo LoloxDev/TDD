@@ -19,4 +19,13 @@ describe('evaluateHand', () => {
     expect(result.category).toBe('OnePair');
     expect(result.chosen5).toEqual(parseCards(['Ah', 'Ad', '9c', '4h', '2d']));
   });
+
+  it('detects TwoPair and orders high pair then low pair then kicker', () => {
+    const cards = parseCards(['Ah', 'Ad', 'Kc', 'Kd', '2d']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('TwoPair');
+    expect(result.chosen5).toEqual(parseCards(['Ah', 'Ad', 'Kc', 'Kd', '2d']));
+  });
 });
