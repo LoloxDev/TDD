@@ -7,3 +7,4 @@ export * from './rankUtils';
 export * from './evaluator';
 export * from './compare';
 export * from './bestOfSeven';
+export * from './game';
