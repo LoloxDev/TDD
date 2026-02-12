@@ -43,6 +43,26 @@ function findTwoPair(cards: Card[]): PlayerHand | null {
   return { category: 'TwoPair', chosen5: [...pairCards, kicker[0]] };
 }
 
+function findStraight(cards: Card[]): PlayerHand | null {
+  const sorted = sortByRankDesc(cards);
+  const values = sorted.map(c => rankValue(c.rank));
+
+  // check if consecutive
+  let isStraight = true;
+  for (let i = 0; i < values.length - 1; i++) {
+    if (values[i] - values[i + 1] !== 1) {
+      isStraight = false;
+      break;
+    }
+  }
+
+  if (isStraight) {
+    return { category: 'Straight', chosen5: sorted };
+  }
+
+  return null;
+}
+
 function findOnePair(cards: Card[]): PlayerHand | null {
   const groups = groupByRank(cards);
   for (const [, group] of groups) {
@@ -59,6 +79,9 @@ export function evaluateHand(cards: Card[]): PlayerHand {
   if (cards.length !== 5) {
     throw new Error('evaluateHand expects exactly 5 cards');
   }
+
+  const straight = findStraight(cards);
+  if (straight) return straight;
 
   const three = findThreeOfAKind(cards);
   if (three) return three;
