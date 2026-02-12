@@ -100,4 +100,24 @@ describe('evaluateHand', () => {
       expect(result.chosen5[4].rank).toBe('A');
     });
   });
+
+  describe('Flush', () => {
+    it('detects a flush (5 same suit)', () => {
+      const cards = parseCards(['Ah', 'Jh', '9h', '6h', '4h']);
+      const result = evaluateHand(cards);
+      expect(result.category).toBe('Flush');
+    });
+
+    it('orders flush cards descending by rank', () => {
+      const cards = parseCards(['4h', 'Ah', '6h', '9h', 'Jh']);
+      const result = evaluateHand(cards);
+      expect(result.chosen5.map(c => c.rank)).toEqual(['A', 'J', '9', '6', '4']);
+    });
+
+    it('does not detect flush with mixed suits', () => {
+      const cards = parseCards(['Ah', 'Jh', '9h', '6h', '4s']);
+      const result = evaluateHand(cards);
+      expect(result.category).not.toBe('Flush');
+    });
+  });
 });
