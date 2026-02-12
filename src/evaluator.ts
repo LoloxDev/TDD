@@ -74,6 +74,14 @@ function findStraight(cards: Card[]): PlayerHand | null {
   return null;
 }
 
+function findFlush(cards: Card[]): PlayerHand | null {
+  const suits = new Set(cards.map(c => c.suit));
+  if (suits.size === 1) {
+    return { category: 'Flush', chosen5: sortByRankDesc(cards) };
+  }
+  return null;
+}
+
 function findOnePair(cards: Card[]): PlayerHand | null {
   const groups = groupByRank(cards);
   for (const [, group] of groups) {
@@ -91,7 +99,15 @@ export function evaluateHand(cards: Card[]): PlayerHand {
     throw new Error('evaluateHand expects exactly 5 cards');
   }
 
+  const flush = findFlush(cards);
   const straight = findStraight(cards);
+
+  if (flush && straight) {
+    // straight flush - will implement later
+    return { category: 'StraightFlush', chosen5: straight.chosen5 };
+  }
+
+  if (flush) return flush;
   if (straight) return straight;
 
   const three = findThreeOfAKind(cards);
