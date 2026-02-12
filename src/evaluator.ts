@@ -5,49 +5,36 @@ function sortByRankDesc(cards: Card[]): Card[] {
   return [...cards].sort((a, b) => rankValue(b.rank) - rankValue(a.rank));
 }
 
-function sortByRankAsc(cards: Card[]): Card[] {
-  return [...cards].sort((a, b) => rankValue(a.rank) - rankValue(b.rank));
+function emptyRankGroups(): Record<Rank, Card[]> {
+  return {
+    '2': [],
+    '3': [],
+    '4': [],
+    '5': [],
+    '6': [],
+    '7': [],
+    '8': [],
+    '9': [],
+    T: [],
+    J: [],
+    Q: [],
+    K: [],
+    A: [],
+  };
 }
 
-function countByRank(cards: Card[]): Record<Rank, number> {
-  const counts = {
-    '2': 0,
-    '3': 0,
-    '4': 0,
-    '5': 0,
-    '6': 0,
-    '7': 0,
-    '8': 0,
-    '9': 0,
-    T: 0,
-    J: 0,
-    Q: 0,
-    K: 0,
-    A: 0,
-  } as Record<Rank, number>;
-
+function groupByRank(cards: Card[]): Record<Rank, Card[]> {
+  const groups = emptyRankGroups();
   for (const card of cards) {
-    counts[card.rank] += 1;
+    groups[card.rank].push(card);
   }
-
-  return counts;
+  return groups;
 }
 
-function highestRankWithCount(counts: Record<Rank, number>, target: number): Rank | null {
-  const ranks = Object.keys(counts) as Rank[];
-  const matching = ranks.filter((rank) => counts[rank] === target);
-
-  if (matching.length === 0) {
-    return null;
-  }
-
-  matching.sort((a, b) => rankValue(b) - rankValue(a));
-  return matching[0];
-}
-
-function ranksWithCount(counts: Record<Rank, number>, target: number): Rank[] {
-  const ranks = (Object.keys(counts) as Rank[]).filter((rank) => counts[rank] === target);
-  return ranks.sort((a, b) => rankValue(b) - rankValue(a));
+function ranksWithCount(groups: Record<Rank, Card[]>, target: number): Rank[] {
+  return (Object.keys(groups) as Rank[])
+    .filter((rank) => groups[rank].length === target)
+    .sort((a, b) => rankValue(b) - rankValue(a));
 }
 
 function isFlush(cards: Card[]): boolean {
@@ -56,21 +43,18 @@ function isFlush(cards: Card[]): boolean {
 
 function straightChosen5(sorted: Card[]): Card[] | null {
   const uniqueRanks = [...new Set(sorted.map((card) => card.rank))] as Rank[];
-
   if (uniqueRanks.length !== 5) {
     return null;
   }
 
   const values = uniqueRanks.map(rankValue);
-  const isNormalStraight = values.every((value, index) => index === 0 || value === values[index - 1] - 1);
-
-  if (isNormalStraight) {
+  const normalStraight = values.every((value, index) => index === 0 || value === values[index - 1] - 1);
+  if (normalStraight) {
     return uniqueRanks.map((rank) => sorted.find((card) => card.rank === rank) as Card);
   }
 
-  const isWheel = uniqueRanks.join('') === 'A5432';
-
-  if (isWheel) {
+  const wheel = uniqueRanks.join('') === 'A5432';
+  if (wheel) {
     const wheelOrder: Rank[] = ['5', '4', '3', '2', 'A'];
     return wheelOrder.map((rank) => sorted.find((card) => card.rank === rank) as Card);
   }
@@ -84,51 +68,75 @@ export function evaluateHand(cards: Card[]): PlayerHand {
   }
 
   const sorted = sortByRankDesc(cards);
-  const counts = countByRank(sorted);
+  const groups = groupByRank(sorted);
+  const fourRanks = ranksWithCount(groups, 4);
+  const tripRanks = ranksWithCount(groups, 3);
+  const pairRanks = ranksWithCount(groups, 2);
+  const flush = isFlush(sorted);
+  const straight = straightChosen5(sorted);
 
-  if (isFlush(sorted)) {
+  if (flush && straight) {
+    return {
+      category: 'StraightFlush',
+      chosen5: straight,
+    };
+  }
+
+  if (fourRanks.length === 1) {
+    const fourRank = fourRanks[0];
+    const fourCards = sorted.filter((card) => card.rank === fourRank);
+    const kicker = sorted.filter((card) => card.rank !== fourRank);
+    return {
+      category: 'FourOfAKind',
+      chosen5: [...fourCards, ...kicker],
+    };
+  }
+
+  if (tripRanks.length === 1 && pairRanks.length === 1) {
+    const tripCards = sorted.filter((card) => card.rank === tripRanks[0]);
+    const pairCards = sorted.filter((card) => card.rank === pairRanks[0]);
+    return {
+      category: 'FullHouse',
+      chosen5: [...tripCards, ...pairCards],
+    };
+  }
+
+  if (flush) {
     return {
       category: 'Flush',
-      chosen5: sortByRankAsc(sorted),
+      chosen5: sorted,
     };
   }
 
-  const straightCards = straightChosen5(sorted);
-  if (straightCards) {
+  if (straight) {
     return {
       category: 'Straight',
-      chosen5: straightCards,
+      chosen5: straight,
     };
   }
 
-  const tripRank = highestRankWithCount(counts, 3);
-  if (tripRank) {
-    const tripCards = sorted.filter((card) => card.rank === tripRank);
-    const kickers = sorted.filter((card) => card.rank !== tripRank);
-
+  if (tripRanks.length === 1) {
+    const tripCards = sorted.filter((card) => card.rank === tripRanks[0]);
+    const kickers = sorted.filter((card) => card.rank !== tripRanks[0]);
     return {
       category: 'ThreeOfAKind',
       chosen5: [...tripCards, ...kickers],
     };
   }
 
-  const pairRanks = ranksWithCount(counts, 2);
   if (pairRanks.length === 2) {
-    const highPair = sorted.filter((card) => card.rank === pairRanks[0]);
-    const lowPair = sorted.filter((card) => card.rank === pairRanks[1]);
+    const highPairCards = sorted.filter((card) => card.rank === pairRanks[0]);
+    const lowPairCards = sorted.filter((card) => card.rank === pairRanks[1]);
     const kicker = sorted.filter((card) => card.rank !== pairRanks[0] && card.rank !== pairRanks[1]);
-
     return {
       category: 'TwoPair',
-      chosen5: [...highPair, ...lowPair, ...kicker],
+      chosen5: [...highPairCards, ...lowPairCards, ...kicker],
     };
   }
 
-  const pairRank = highestRankWithCount(counts, 2);
-
-  if (pairRank) {
-    const pairCards = sorted.filter((card) => card.rank === pairRank);
-    const kickers = sorted.filter((card) => card.rank !== pairRank);
+  if (pairRanks.length === 1) {
+    const pairCards = sorted.filter((card) => card.rank === pairRanks[0]);
+    const kickers = sorted.filter((card) => card.rank !== pairRanks[0]);
     return {
       category: 'OnePair',
       chosen5: [...pairCards, ...kickers],

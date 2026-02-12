@@ -73,4 +73,49 @@ describe('evaluateHand', () => {
     expect(result.category).toBe('Flush');
     expect(result.chosen5).toEqual(parseCards(['Ah', 'Jh', '9h', '4h', '2h']));
   });
+
+  it('detects FullHouse and puts trips first then pair', () => {
+    const cards = parseCards(['Ah', 'Ad', 'Ac', 'Kd', 'Kc']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('FullHouse');
+    expect(result.chosen5).toEqual(parseCards(['Ah', 'Ad', 'Ac', 'Kd', 'Kc']));
+  });
+
+  it('detects FourOfAKind and keeps best kicker', () => {
+    const cards = parseCards(['7c', '7d', '7h', '7s', 'Ad']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('FourOfAKind');
+    expect(result.chosen5).toEqual(parseCards(['7c', '7d', '7h', '7s', 'Ad']));
+  });
+
+  it('detects StraightFlush', () => {
+    const cards = parseCards(['9h', '8h', '7h', '6h', '5h']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('StraightFlush');
+    expect(result.chosen5).toEqual(parseCards(['9h', '8h', '7h', '6h', '5h']));
+  });
+
+  it('detects royal flush as StraightFlush', () => {
+    const cards = parseCards(['Ah', 'Kh', 'Qh', 'Jh', 'Th']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('StraightFlush');
+    expect(result.chosen5).toEqual(parseCards(['Ah', 'Kh', 'Qh', 'Jh', 'Th']));
+  });
+
+  it('detects wheel StraightFlush (5-high)', () => {
+    const cards = parseCards(['Ah', '2h', '3h', '4h', '5h']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('StraightFlush');
+    expect(result.chosen5).toEqual(parseCards(['5h', '4h', '3h', '2h', 'Ah']));
+  });
 });

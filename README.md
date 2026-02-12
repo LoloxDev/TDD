@@ -34,6 +34,17 @@ Exemple : `As` = Ace of spades, `Th` = 10 of hearts
 8. One pair
 9. High card
 
+## Convention `chosen5` (ordre)
+
+- Straight flush / Straight : de la plus haute a la plus basse (wheel = `5,4,3,2,A`)
+- Four of a kind : les 4 cartes du carre puis le kicker
+- Full house : les 3 cartes du brelan puis les 2 cartes de la paire
+- Flush : 5 cartes triees par rang decroissant
+- Three of a kind : brelan puis 2 kickers decroissants
+- Two pair : paire haute, paire basse, kicker
+- One pair : paire puis 3 kickers decroissants
+- High card : 5 cartes decroissantes
+
 ## Lancer les tests
 
 ```bash
