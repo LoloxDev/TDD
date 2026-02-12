@@ -74,6 +74,18 @@ function findStraight(cards: Card[]): PlayerHand | null {
   return null;
 }
 
+function findFourOfAKind(cards: Card[]): PlayerHand | null {
+  const groups = groupByRank(cards);
+  for (const [, group] of groups) {
+    if (group.length === 4) {
+      const quad = group;
+      const kicker = cards.find(c => c.rank !== quad[0].rank)!;
+      return { category: 'FourOfAKind', chosen5: [...quad, kicker] };
+    }
+  }
+  return null;
+}
+
 function findFullHouse(cards: Card[]): PlayerHand | null {
   const groups = groupByRank(cards);
   let triplet: Card[] | null = null;
@@ -117,9 +129,11 @@ export function evaluateHand(cards: Card[]): PlayerHand {
   const straight = findStraight(cards);
 
   if (flush && straight) {
-    // straight flush - will implement later
     return { category: 'StraightFlush', chosen5: straight.chosen5 };
   }
+
+  const four = findFourOfAKind(cards);
+  if (four) return four;
 
   const fullHouse = findFullHouse(cards);
   if (fullHouse) return fullHouse;
