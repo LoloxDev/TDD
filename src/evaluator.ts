@@ -54,6 +54,17 @@ export function evaluateHand(cards: Card[]): PlayerHand {
   const sorted = sortByRankDesc(cards);
   const counts = countByRank(sorted);
 
+  const tripRank = highestRankWithCount(counts, 3);
+  if (tripRank) {
+    const tripCards = sorted.filter((card) => card.rank === tripRank);
+    const kickers = sorted.filter((card) => card.rank !== tripRank);
+
+    return {
+      category: 'ThreeOfAKind',
+      chosen5: [...tripCards, ...kickers],
+    };
+  }
+
   const pairRanks = ranksWithCount(counts, 2);
   if (pairRanks.length === 2) {
     const highPair = sorted.filter((card) => card.rank === pairRanks[0]);
