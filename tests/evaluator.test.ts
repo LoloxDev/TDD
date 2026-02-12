@@ -64,4 +64,13 @@ describe('evaluateHand', () => {
     expect(result.category).toBe('Flush');
     expect(result.chosen5).toHaveLength(5);
   });
+
+  it('orders Flush chosen5 from highest to lowest', () => {
+    const cards = parseCards(['Ah', 'Jh', '9h', '4h', '2h']);
+
+    const result = evaluateHand(cards);
+
+    expect(result.category).toBe('Flush');
+    expect(result.chosen5).toEqual(parseCards(['Ah', 'Jh', '9h', '4h', '2h']));
+  });
 });
